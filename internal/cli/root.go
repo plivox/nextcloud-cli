@@ -1,11 +1,11 @@
-package cmd
+package cli
 
 import (
 	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
-	deckcmd "github.com/plivox/nextcloud-cli/cmd/deck"
+	deckcmd "github.com/plivox/nextcloud-cli/internal/cli/deck"
 	"github.com/spf13/cobra"
 )
 

@@ -1,7 +1,7 @@
 package main
 
-import "github.com/plivox/nextcloud-cli/cmd"
+import "github.com/plivox/nextcloud-cli/internal/cli"
 
 func main() {
-	cmd.Execute()
+	cli.Execute()
 }
