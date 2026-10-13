@@ -1,6 +1,6 @@
 # nextcloud-cli
 
-A command-line client for Nextcloud. It currently supports Files and [Deck](https://apps.nextcloud.com/apps/deck) (read-only).
+A command-line client for Nextcloud. It currently supports Files and [Deck](https://apps.nextcloud.com/apps/deck), and can run as an [MCP](https://modelcontextprotocol.io) server for AI assistants.
 
 ## Installation
 
@@ -74,7 +74,38 @@ nextcloud deck card list --board 40 --column id,title,assignees
 nextcloud deck card list --board 40 --json --download ./backup
 ```
 
+Creating and updating:
+
+```sh
+nextcloud deck board create "Roadmap" [--color ff0000]
+nextcloud deck board update <id> [--title ...] [--color ...] [--archived]
+nextcloud deck stack create --board <id> "To do"
+nextcloud deck card create --board <id> --stack "To do" "Write docs" [--description ...] [--due 2026-11-01]
+nextcloud deck card update <id> [--title ...] [--description ...] [--due ...|none] [--done] [--archived]
+nextcloud deck card move <id> --stack "Done"
+nextcloud deck card assign <id> me
+nextcloud deck card label <id> "Bug"
+nextcloud deck card comment <id> "Looks good"
+nextcloud deck card delete <id>
+```
+
 Run `nextcloud <command> --help` for all options.
+
+## MCP server
+
+`nextcloud mcp` runs a [Model Context Protocol](https://modelcontextprotocol.io) server on stdio, using the same credentials as the CLI (run `nextcloud login` first). For example with Claude Code:
+
+```sh
+claude mcp add nextcloud -- nextcloud mcp
+```
+
+Read-only tools are always available: `deck_list_boards`, `deck_get_board`, `deck_list_cards`, `deck_get_card`, `files_list`, `files_read`.
+
+Tools that create, change or delete boards, stacks, cards, comments and files are only exposed with `--allow-write`:
+
+```sh
+claude mcp add nextcloud -- nextcloud mcp --allow-write
+```
 
 ## Development
 

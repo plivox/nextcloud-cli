@@ -6,11 +6,12 @@ type Owner struct {
 }
 
 type Board struct {
-	ID       int    `json:"id"`
-	Title    string `json:"title"`
-	Owner    Owner  `json:"owner"`
-	Color    string `json:"color"`
-	Archived bool   `json:"archived"`
+	ID       int     `json:"id"`
+	Title    string  `json:"title"`
+	Owner    Owner   `json:"owner"`
+	Color    string  `json:"color"`
+	Archived bool    `json:"archived"`
+	Labels   []Label `json:"labels,omitempty"`
 }
 
 func (c *Client) ListBoards() ([]Board, error) {

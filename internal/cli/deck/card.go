@@ -34,13 +34,6 @@ var defaultCardListColumns = []string{
 	"attachments",
 }
 
-var cardStatuses = map[string]string{
-	"in-progress": "In progress",
-	"overdue":     "Overdue",
-	"done":        "Done",
-	"archived":    "Archived",
-}
-
 type cardColumn struct {
 	header string
 	value  func(s deck.Stack, c deck.Card, withAttachments bool) interface{}
@@ -196,49 +189,13 @@ var cardListCmd = &cobra.Command{
 			return err
 		}
 
-		statuses := make(map[string]bool, len(cardListStatusFlag))
-		for _, key := range cardListStatusFlag {
-			status, ok := cardStatuses[strings.ToLower(key)]
-			if !ok {
-				return fmt.Errorf(
-					"unknown status: %q (available: %s)",
-					key,
-					strings.Join(sortedKeys(cardStatuses), ", "),
-				)
-			}
-
-			statuses[status] = true
-		}
-
-		stacks, err := client.ListStacks(cardListBoardFlag)
+		stacks, err := client.ListCards(cardListBoardFlag, deck.CardFilter{
+			Statuses:  cardListStatusFlag,
+			Stacks:    cardListStackFlag,
+			Assignees: cardListAssigneeFlag,
+		})
 		if err != nil {
 			return err
-		}
-
-		if statuses["Archived"] {
-			archived, err := client.ListArchivedStacks(cardListBoardFlag)
-			if err != nil {
-				return err
-			}
-
-			stacks = mergeStacks(stacks, archived)
-		}
-
-		stacks, err = filterStacks(stacks, cardListStackFlag)
-		if err != nil {
-			return err
-		}
-
-		if len(statuses) > 0 {
-			stacks = filterCardsByStatus(stacks, statuses)
-		}
-
-		if len(cardListAssigneeFlag) > 0 {
-			stacks = filterCardsByAssignee(
-				stacks,
-				cardListAssigneeFlag,
-				client.Username,
-			)
 		}
 
 		needAttachments := cardListAttachmentsFlag || cardListDownloadFlag != ""
@@ -430,7 +387,7 @@ func init() {
 		nil,
 		fmt.Sprintf(
 			"Only show cards with this status, comma-separated or repeated (available: %s)",
-			strings.Join(sortedKeys(cardStatuses), ", "),
+			strings.Join(deck.StatusKeys(), ", "),
 		),
 	)
 	cardListCmd.Flags().StringSliceVar(
@@ -457,131 +414,4 @@ func init() {
 
 	cardCmd.AddCommand(cardListCmd)
 	Cmd.AddCommand(cardCmd)
-}
-
-func sortedKeys(m map[string]string) []string {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-
-	sort.Strings(keys)
-
-	return keys
-}
-
-func mergeStacks(stacks, extra []deck.Stack) []deck.Stack {
-	index := make(map[int]int, len(stacks))
-	for i, s := range stacks {
-		index[s.ID] = i
-	}
-
-	for _, s := range extra {
-		if i, ok := index[s.ID]; ok {
-			stacks[i].Cards = append(stacks[i].Cards, s.Cards...)
-		} else {
-			index[s.ID] = len(stacks)
-			stacks = append(stacks, s)
-		}
-	}
-
-	return stacks
-}
-
-func filterStacks(stacks []deck.Stack, filters []string) ([]deck.Stack, error) {
-	if len(filters) == 0 {
-		return stacks, nil
-	}
-
-	var kept []deck.Stack
-
-	for _, f := range filters {
-		found := false
-
-		for _, s := range stacks {
-			if strconv.Itoa(s.ID) == f || strings.EqualFold(s.Title, f) {
-				kept = append(kept, s)
-				found = true
-			}
-		}
-
-		if !found {
-			titles := make([]string, len(stacks))
-			for i, s := range stacks {
-				titles[i] = fmt.Sprintf("[%d] %s", s.ID, s.Title)
-			}
-
-			return nil, fmt.Errorf(
-				"unknown stack: %q (available: %s)",
-				f,
-				strings.Join(titles, ", "),
-			)
-		}
-	}
-
-	return kept, nil
-}
-
-func filterCardsByStatus(
-	stacks []deck.Stack,
-	statuses map[string]bool,
-) []deck.Stack {
-	for i, s := range stacks {
-		var cards []deck.Card
-
-		for _, c := range s.Cards {
-			if statuses[c.Status()] {
-				cards = append(cards, c)
-			}
-		}
-
-		stacks[i].Cards = cards
-	}
-
-	return stacks
-}
-
-func filterCardsByAssignee(
-	stacks []deck.Stack,
-	filters []string,
-	me string,
-) []deck.Stack {
-	matches := func(c deck.Card) bool {
-		for _, f := range filters {
-			f = strings.ToLower(f)
-			if f == "none" && len(c.AssignedUsers) == 0 {
-				return true
-			}
-
-			if f == "me" {
-				f = strings.ToLower(me)
-			}
-
-			for _, a := range c.AssignedUsers {
-				if strings.ToLower(a.Participant.UID) == f ||
-					strings.Contains(
-						strings.ToLower(a.Participant.DisplayName),
-						f,
-					) {
-					return true
-				}
-			}
-		}
-
-		return false
-	}
-
-	for i, s := range stacks {
-		var cards []deck.Card
-
-		for _, c := range s.Cards {
-			if matches(c) {
-				cards = append(cards, c)
-			}
-		}
-
-		stacks[i].Cards = cards
-	}
-
-	return stacks
 }

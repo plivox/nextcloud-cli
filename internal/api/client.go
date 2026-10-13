@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -53,20 +54,39 @@ func (c *Client) GetJSON(
 	params PathParams,
 	out interface{},
 ) error {
-	resp, err := c.OCSRequest(params).
-		SetHeader("Accept", "application/json").
-		SetResult(out).
-		Get(path)
+	return c.SendJSON(http.MethodGet, path, params, nil, out)
+}
+
+func (c *Client) SendJSON(
+	method, path string,
+	params PathParams,
+	body, out interface{},
+) error {
+	req := c.OCSRequest(params).SetHeader("Accept", "application/json")
+	if body != nil {
+		req.SetBody(body)
+	}
+
+	if out != nil {
+		req.SetResult(out)
+	}
+
+	resp, err := req.Execute(method, path)
 	if err != nil {
 		return err
 	}
 
 	if resp.StatusCode() != http.StatusOK {
-		return fmt.Errorf(
-			"request to %s failed: %s",
-			resp.Request.URL,
-			resp.Status(),
-		)
+		msg := resp.Status()
+
+		var apiErr struct {
+			Message string `json:"message"`
+		}
+		if json.Unmarshal(resp.Body(), &apiErr) == nil && apiErr.Message != "" {
+			msg += ": " + apiErr.Message
+		}
+
+		return fmt.Errorf("%s %s failed: %s", method, resp.Request.URL, msg)
 	}
 
 	return nil
