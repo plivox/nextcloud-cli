@@ -1,0 +1,24 @@
+{
+  "[go]": {
+    "editor.defaultFormatter": "golang.go",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "go.useLanguageServer": true,
+  "go.formatTool": "custom",
+  "go.lintOnSave": "package",
+  "gopls": {
+    "formatting.gofumpt": false
+  },
+  "go.alternateTools": {
+    "customFormatter": "golines"
+  },
+  "go.formatFlags": [
+    "-m",
+    "80",
+    "--no-chain-split-dots"
+  ],
+  "go.lintTool": "golangci-lint-v2"
+}
