@@ -146,7 +146,7 @@ func (c *Client) CreateCard(boardID, stackID int, n NewCard) (Card, error) {
 		"description": n.Description,
 	}
 	if n.DueDate != nil {
-		body["duedate"] = n.DueDate.Format(time.RFC3339)
+		body["duedate"] = n.DueDate.UTC().Format(time.RFC3339)
 	}
 
 	var card Card
@@ -179,7 +179,7 @@ func (c *Client) UpdateCard(
 	}
 
 	if u.DueDate != nil {
-		due := u.DueDate.Format(time.RFC3339)
+		due := u.DueDate.UTC().Format(time.RFC3339)
 		card.DueDate = &due
 	}
 
@@ -191,7 +191,7 @@ func (c *Client) UpdateCard(
 		card.Done = nil
 
 		if *u.Done {
-			now := time.Now().Format(time.RFC3339)
+			now := time.Now().UTC().Format(time.RFC3339)
 			card.Done = &now
 		}
 	}
@@ -228,7 +228,7 @@ func (c *Client) MoveCard(
 	boardID, stackID, cardID, toStackID, order int,
 ) error {
 	return c.SendJSON(http.MethodPut, cardPath+"/reorder",
-		pathParams{"boardId": boardID, "stackId": stackID, "cardId": cardID},
+		pathParams{"boardId": boardID, "stackId": toStackID, "cardId": cardID},
 		map[string]interface{}{"stackId": toStackID, "order": order}, nil)
 }
 
