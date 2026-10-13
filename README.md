@@ -22,9 +22,9 @@ make build   # produces ./nextcloud
 nextcloud login cloud.example.com
 ```
 
-This opens your browser to log in (2FA and SSO work), then stores a dedicated app password in the system keyring (macOS Keychain, Windows Credential Manager, or Secret Service on Linux). Your main password is never seen by the CLI.
+This opens your browser to log in (2FA and SSO work), then stores a dedicated app password in the system keyring (macOS Keychain, Windows Credential Manager, or Secret Service on Linux). If no keyring is available (e.g. a headless Linux server), it falls back to `~/.config/nextcloud-cli/credentials.json`, readable only by you (mode 600). Your main password is never seen by the CLI.
 
-`nextcloud logout` revokes that app password on the server and removes it from the keyring.
+`nextcloud logout` revokes that app password on the server and removes it from this machine.
 
 ### Environment variables
 

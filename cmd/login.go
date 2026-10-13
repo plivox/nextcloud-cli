@@ -14,7 +14,7 @@ import (
 
 var loginCmd = &cobra.Command{
 	Use:   "login <server>",
-	Short: "Log in through the browser and store an app password in the system keyring",
+	Short: "Log in through the browser and store an app password (system keyring, or a file in the user config dir)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		server := nextcloud.NormalizeServer(args[0])
@@ -45,16 +45,18 @@ var loginCmd = &cobra.Command{
 
 		creds.UserID = userID
 
-		if err := nextcloud.SaveKeyringCredentials(creds); err != nil {
-			return fmt.Errorf("saving to the keyring: %w", err)
+		location, err := nextcloud.SaveStoredCredentials(creds)
+		if err != nil {
+			return fmt.Errorf("saving credentials: %w", err)
 		}
 
 		fmt.Fprintf(os.Stdout, "Logged in to %s as %s\n", creds.Server, userID)
+		fmt.Fprintf(os.Stderr, "Credentials stored in %s\n", location)
 
 		if nextcloud.CredentialsFromEnv() {
 			fmt.Fprintln(
 				os.Stderr,
-				"Warning: NEXTCLOUD_CLI_* variables are set (environment or .env) and take precedence over the keyring.",
+				"Warning: NEXTCLOUD_CLI_* variables are set (environment or .env) and take precedence over the stored credentials.",
 			)
 		}
 
@@ -64,10 +66,10 @@ var loginCmd = &cobra.Command{
 
 var logoutCmd = &cobra.Command{
 	Use:   "logout",
-	Short: "Revoke the stored app password and remove it from the system keyring",
+	Short: "Revoke the stored app password and remove it from this machine",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		creds, err := nextcloud.LoadKeyringCredentials()
+		creds, err := nextcloud.LoadStoredCredentials()
 		if errors.Is(err, nextcloud.ErrNotLoggedIn) {
 			fmt.Fprintln(os.Stdout, "Not logged in.")
 			return nil
@@ -82,12 +84,12 @@ var logoutCmd = &cobra.Command{
 		).RevokeAppPassword(); err != nil {
 			fmt.Fprintf(
 				os.Stderr,
-				"Warning: %v (removing it from the keyring anyway)\n",
+				"Warning: %v (removing it locally anyway)\n",
 				err,
 			)
 		}
 
-		if err := nextcloud.DeleteKeyringCredentials(); err != nil {
+		if err := nextcloud.DeleteStoredCredentials(); err != nil {
 			return err
 		}
 
