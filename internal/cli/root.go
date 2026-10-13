@@ -6,6 +6,7 @@ import (
 
 	"github.com/joho/godotenv"
 	deckcmd "github.com/plivox/nextcloud-cli/internal/cli/deck"
+	filescmd "github.com/plivox/nextcloud-cli/internal/cli/files"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +21,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(deckcmd.Cmd)
+	rootCmd.AddCommand(filescmd.Cmd)
 }
 
 func Execute() {

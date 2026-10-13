@@ -1,6 +1,6 @@
 # nextcloud-cli
 
-A command-line client for Nextcloud. It currently supports [Deck](https://apps.nextcloud.com/apps/deck) (read-only).
+A command-line client for Nextcloud. It currently supports Files and [Deck](https://apps.nextcloud.com/apps/deck) (read-only).
 
 ## Installation
 
@@ -39,6 +39,18 @@ NEXTCLOUD_CLI_PASSWORD=your_password
 Using an [app password](https://docs.nextcloud.com/server/latest/user_manual/en/session_management.html#managing-devices) rather than your main password is recommended.
 
 ## Usage
+
+### Files
+
+```sh
+nextcloud files ls [path]
+nextcloud files get <remote> [local]   # to the current directory by default
+nextcloud files put <local> [remote]   # to the root folder by default
+nextcloud files mkdir <path>
+nextcloud files rm <path>              # -r for a folder
+```
+
+### Deck
 
 ```sh
 nextcloud deck board list

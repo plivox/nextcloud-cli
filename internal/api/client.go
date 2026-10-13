@@ -9,9 +9,11 @@ import (
 )
 
 type Client struct {
-	BaseURL  string
-	Username string
-	r        *resty.Client
+	BaseURL   string
+	Username  string
+	loginName string
+	password  string
+	r         *resty.Client
 }
 
 type PathParams map[string]int
@@ -25,9 +27,11 @@ func NewClient(server, loginName, password, userID string) *Client {
 		SetHeader("User-Agent", UserAgent)
 
 	return &Client{
-		BaseURL:  server,
-		Username: userID,
-		r:        r,
+		BaseURL:   server,
+		Username:  userID,
+		loginName: loginName,
+		password:  password,
+		r:         r,
 	}
 }
 
