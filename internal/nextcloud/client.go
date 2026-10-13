@@ -3,7 +3,6 @@ package nextcloud
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/go-resty/resty/v2"
@@ -17,26 +16,26 @@ type Client struct {
 
 type PathParams map[string]int
 
-func NewClientFromEnv() (*Client, error) {
-	baseURL := os.Getenv("NEXTCLOUD_CLI_BASE_URL")
-	username := os.Getenv("NEXTCLOUD_CLI_USERNAME")
-	password := os.Getenv("NEXTCLOUD_CLI_PASSWORD")
-
-	if baseURL == "" || username == "" || password == "" {
-		return nil, fmt.Errorf(
-			"NEXTCLOUD_CLI_BASE_URL, NEXTCLOUD_CLI_USERNAME and NEXTCLOUD_CLI_PASSWORD must be set (via .env or the environment)",
-		)
+func NewClient() (*Client, error) {
+	creds, err := LoadCredentials()
+	if err != nil {
+		return nil, err
 	}
 
+	return NewClientFromCredentials(creds), nil
+}
+
+func NewClientFromCredentials(creds Credentials) *Client {
 	r := resty.New().
-		SetBaseURL(baseURL).
-		SetBasicAuth(username, password)
+		SetBaseURL(creds.Server).
+		SetBasicAuth(creds.LoginName, creds.AppPassword).
+		SetHeader("User-Agent", userAgent)
 
 	return &Client{
-		BaseURL:  baseURL,
-		Username: username,
+		BaseURL:  creds.Server,
+		Username: creds.UserID,
 		r:        r,
-	}, nil
+	}
 }
 
 func (c *Client) R() *resty.Request {

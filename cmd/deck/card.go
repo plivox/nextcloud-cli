@@ -126,7 +126,7 @@ var cardCmd = &cobra.Command{
 			return fmt.Errorf("invalid card id: %s", args[0])
 		}
 
-		client, err := deck.NewClientFromEnv()
+		client, err := deck.NewClient()
 		if err != nil {
 			return err
 		}
@@ -191,7 +191,7 @@ var cardListCmd = &cobra.Command{
 	Short: "List a board's cards, grouped by stack",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := deck.NewClientFromEnv()
+		client, err := deck.NewClient()
 		if err != nil {
 			return err
 		}

@@ -14,9 +14,21 @@ Or from a clone:
 make build   # produces ./nextcloud
 ```
 
-## Configuration
+## Authentication
 
-Set these variables in your environment, or in a `.env` file in the current directory (see `.env.example`):
+### Browser login (recommended)
+
+```sh
+nextcloud login cloud.example.com
+```
+
+This opens your browser to log in (2FA and SSO work), then stores a dedicated app password in the system keyring (macOS Keychain, Windows Credential Manager, or Secret Service on Linux). Your main password is never seen by the CLI.
+
+`nextcloud logout` revokes that app password on the server and removes it from the keyring.
+
+### Environment variables
+
+For scripts and CI, set these variables in your environment, or in a `.env` file in the current directory (see `.env.example`). They take precedence over the keyring.
 
 ```sh
 NEXTCLOUD_CLI_BASE_URL=https://cloud.example.com

@@ -23,7 +23,7 @@ var stackCmd = &cobra.Command{
 			return fmt.Errorf("invalid stack id: %s", args[0])
 		}
 
-		client, err := deck.NewClientFromEnv()
+		client, err := deck.NewClient()
 		if err != nil {
 			return err
 		}
@@ -48,7 +48,7 @@ var stackListCmd = &cobra.Command{
 	Short: "List a board's stacks (columns)",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := deck.NewClientFromEnv()
+		client, err := deck.NewClient()
 		if err != nil {
 			return err
 		}

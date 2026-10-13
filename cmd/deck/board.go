@@ -20,7 +20,7 @@ var boardCmd = &cobra.Command{
 			return fmt.Errorf("invalid board id: %s", args[0])
 		}
 
-		client, err := deck.NewClientFromEnv()
+		client, err := deck.NewClient()
 		if err != nil {
 			return err
 		}
@@ -50,7 +50,7 @@ var boardListCmd = &cobra.Command{
 	Short: "List boards",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := deck.NewClientFromEnv()
+		client, err := deck.NewClient()
 		if err != nil {
 			return err
 		}

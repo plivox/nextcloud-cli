@@ -1,0 +1,118 @@
+package cmd
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"os/exec"
+	"runtime"
+	"time"
+
+	"github.com/plivox/nextcloud-cli/internal/nextcloud"
+	"github.com/spf13/cobra"
+)
+
+var loginCmd = &cobra.Command{
+	Use:   "login <server>",
+	Short: "Log in through the browser and store an app password in the system keyring",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		server := nextcloud.NormalizeServer(args[0])
+
+		flow, err := nextcloud.StartLoginFlow(server)
+		if err != nil {
+			return err
+		}
+
+		fmt.Fprintf(
+			os.Stderr,
+			"Open this URL in your browser to log in:\n\n  %s\n\n",
+			flow.LoginURL,
+		)
+		_ = openBrowser(flow.LoginURL)
+
+		fmt.Fprintln(os.Stderr, "Waiting for authorization...")
+
+		creds, err := flow.Wait(20 * time.Minute)
+		if err != nil {
+			return err
+		}
+
+		userID, err := nextcloud.NewClientFromCredentials(creds).CurrentUserID()
+		if err != nil {
+			return err
+		}
+
+		creds.UserID = userID
+
+		if err := nextcloud.SaveKeyringCredentials(creds); err != nil {
+			return fmt.Errorf("saving to the keyring: %w", err)
+		}
+
+		fmt.Fprintf(os.Stdout, "Logged in to %s as %s\n", creds.Server, userID)
+
+		if nextcloud.CredentialsFromEnv() {
+			fmt.Fprintln(
+				os.Stderr,
+				"Warning: NEXTCLOUD_CLI_* variables are set (environment or .env) and take precedence over the keyring.",
+			)
+		}
+
+		return nil
+	},
+}
+
+var logoutCmd = &cobra.Command{
+	Use:   "logout",
+	Short: "Revoke the stored app password and remove it from the system keyring",
+	Args:  cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		creds, err := nextcloud.LoadKeyringCredentials()
+		if errors.Is(err, nextcloud.ErrNotLoggedIn) {
+			fmt.Fprintln(os.Stdout, "Not logged in.")
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		if err := nextcloud.NewClientFromCredentials(
+			creds,
+		).RevokeAppPassword(); err != nil {
+			fmt.Fprintf(
+				os.Stderr,
+				"Warning: %v (removing it from the keyring anyway)\n",
+				err,
+			)
+		}
+
+		if err := nextcloud.DeleteKeyringCredentials(); err != nil {
+			return err
+		}
+
+		fmt.Fprintf(os.Stdout, "Logged out from %s\n", creds.Server)
+
+		return nil
+	},
+}
+
+func openBrowser(url string) error {
+	switch runtime.GOOS {
+	case "darwin":
+		return exec.Command("open", url).Start()
+	case "windows":
+		return exec.Command(
+			"rundll32",
+			"url.dll,FileProtocolHandler",
+			url,
+		).Start()
+	default:
+		return exec.Command("xdg-open", url).Start()
+	}
+}
+
+func init() {
+	rootCmd.AddCommand(loginCmd)
+	rootCmd.AddCommand(logoutCmd)
+}

@@ -13,8 +13,8 @@ type Client struct {
 
 type pathParams = nextcloud.PathParams
 
-func NewClientFromEnv() (*Client, error) {
-	nc, err := nextcloud.NewClientFromEnv()
+func NewClient() (*Client, error) {
+	nc, err := nextcloud.NewClient()
 	if err != nil {
 		return nil, err
 	}
