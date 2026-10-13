@@ -1,4 +1,4 @@
-package nextcloud
+package auth
 
 import (
 	"encoding/json"
@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/plivox/nextcloud-cli/internal/api"
 	"github.com/zalando/go-keyring"
 )
 
@@ -49,6 +50,19 @@ func LoadCredentials() (Credentials, error) {
 	}
 
 	return LoadStoredCredentials()
+}
+
+func NewClient() (*api.Client, error) {
+	creds, err := LoadCredentials()
+	if err != nil {
+		return nil, err
+	}
+
+	return creds.Client(), nil
+}
+
+func (c Credentials) Client() *api.Client {
+	return api.NewClient(c.Server, c.LoginName, c.AppPassword, c.UserID)
 }
 
 func CredentialsFromEnv() bool {

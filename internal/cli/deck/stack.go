@@ -5,8 +5,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/plivox/nextcloud-cli/internal/deck"
-
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +21,7 @@ var stackCmd = &cobra.Command{
 			return fmt.Errorf("invalid stack id: %s", args[0])
 		}
 
-		client, err := deck.NewClient()
+		client, err := newClient()
 		if err != nil {
 			return err
 		}
@@ -48,7 +46,7 @@ var stackListCmd = &cobra.Command{
 	Short: "List a board's stacks (columns)",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := deck.NewClient()
+		client, err := newClient()
 		if err != nil {
 			return err
 		}

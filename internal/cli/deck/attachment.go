@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/plivox/nextcloud-cli/internal/deck"
-
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +26,7 @@ var attachmentListCmd = &cobra.Command{
 			return fmt.Errorf("invalid card id: %s", args[0])
 		}
 
-		client, err := deck.NewClient()
+		client, err := newClient()
 		if err != nil {
 			return err
 		}

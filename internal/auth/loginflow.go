@@ -1,4 +1,4 @@
-package nextcloud
+package auth
 
 import (
 	"errors"
@@ -7,9 +7,8 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/plivox/nextcloud-cli/internal/api"
 )
-
-const userAgent = "nextcloud-cli"
 
 type LoginFlow struct {
 	LoginURL string
@@ -27,7 +26,7 @@ func StartLoginFlow(server string) (*LoginFlow, error) {
 		Login string `json:"login"`
 	}
 
-	r := resty.New().SetHeader("User-Agent", userAgent)
+	r := resty.New().SetHeader("User-Agent", api.UserAgent)
 
 	resp, err := r.R().SetResult(&init).Post(server + "/index.php/login/v2")
 	if err != nil {
@@ -78,33 +77,4 @@ func (f *LoginFlow) Wait(timeout time.Duration) (Credentials, error) {
 	}
 
 	return Credentials{}, errors.New("login timed out")
-}
-
-func (c *Client) CurrentUserID() (string, error) {
-	var user struct {
-		OCS struct {
-			Data struct {
-				ID string `json:"id"`
-			} `json:"data"`
-		} `json:"ocs"`
-	}
-
-	if err := c.GetJSON("/ocs/v2.php/cloud/user", nil, &user); err != nil {
-		return "", err
-	}
-
-	return user.OCS.Data.ID, nil
-}
-
-func (c *Client) RevokeAppPassword() error {
-	resp, err := c.OCSRequest(nil).Delete("/ocs/v2.php/core/apppassword")
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode() != http.StatusOK {
-		return fmt.Errorf("revoking the app password failed: %s", resp.Status())
-	}
-
-	return nil
 }

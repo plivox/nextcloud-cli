@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/plivox/nextcloud-cli/internal/nextcloud"
+	"github.com/plivox/nextcloud-cli/internal/auth"
 	"github.com/spf13/cobra"
 )
 
@@ -17,9 +17,9 @@ var loginCmd = &cobra.Command{
 	Short: "Log in through the browser and store an app password (system keyring, or a file in the user config dir)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		server := nextcloud.NormalizeServer(args[0])
+		server := auth.NormalizeServer(args[0])
 
-		flow, err := nextcloud.StartLoginFlow(server)
+		flow, err := auth.StartLoginFlow(server)
 		if err != nil {
 			return err
 		}
@@ -38,14 +38,14 @@ var loginCmd = &cobra.Command{
 			return err
 		}
 
-		userID, err := nextcloud.NewClientFromCredentials(creds).CurrentUserID()
+		userID, err := creds.Client().CurrentUserID()
 		if err != nil {
 			return err
 		}
 
 		creds.UserID = userID
 
-		location, err := nextcloud.SaveStoredCredentials(creds)
+		location, err := auth.SaveStoredCredentials(creds)
 		if err != nil {
 			return fmt.Errorf("saving credentials: %w", err)
 		}
@@ -53,7 +53,7 @@ var loginCmd = &cobra.Command{
 		fmt.Fprintf(os.Stdout, "Logged in to %s as %s\n", creds.Server, userID)
 		fmt.Fprintf(os.Stderr, "Credentials stored in %s\n", location)
 
-		if nextcloud.CredentialsFromEnv() {
+		if auth.CredentialsFromEnv() {
 			fmt.Fprintln(
 				os.Stderr,
 				"Warning: NEXTCLOUD_CLI_* variables are set (environment or .env) and take precedence over the stored credentials.",
@@ -69,8 +69,8 @@ var logoutCmd = &cobra.Command{
 	Short: "Revoke the stored app password and remove it from this machine",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		creds, err := nextcloud.LoadStoredCredentials()
-		if errors.Is(err, nextcloud.ErrNotLoggedIn) {
+		creds, err := auth.LoadStoredCredentials()
+		if errors.Is(err, auth.ErrNotLoggedIn) {
 			fmt.Fprintln(os.Stdout, "Not logged in.")
 			return nil
 		}
@@ -79,9 +79,7 @@ var logoutCmd = &cobra.Command{
 			return err
 		}
 
-		if err := nextcloud.NewClientFromCredentials(
-			creds,
-		).RevokeAppPassword(); err != nil {
+		if err := creds.Client().RevokeAppPassword(); err != nil {
 			fmt.Fprintf(
 				os.Stderr,
 				"Warning: %v (removing it locally anyway)\n",
@@ -89,7 +87,7 @@ var logoutCmd = &cobra.Command{
 			)
 		}
 
-		if err := nextcloud.DeleteStoredCredentials(); err != nil {
+		if err := auth.DeleteStoredCredentials(); err != nil {
 			return err
 		}
 

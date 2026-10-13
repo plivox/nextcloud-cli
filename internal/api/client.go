@@ -1,4 +1,4 @@
-package nextcloud
+package api
 
 import (
 	"fmt"
@@ -16,24 +16,17 @@ type Client struct {
 
 type PathParams map[string]int
 
-func NewClient() (*Client, error) {
-	creds, err := LoadCredentials()
-	if err != nil {
-		return nil, err
-	}
+const UserAgent = "nextcloud-cli"
 
-	return NewClientFromCredentials(creds), nil
-}
-
-func NewClientFromCredentials(creds Credentials) *Client {
+func NewClient(server, loginName, password, userID string) *Client {
 	r := resty.New().
-		SetBaseURL(creds.Server).
-		SetBasicAuth(creds.LoginName, creds.AppPassword).
-		SetHeader("User-Agent", userAgent)
+		SetBaseURL(server).
+		SetBasicAuth(loginName, password).
+		SetHeader("User-Agent", UserAgent)
 
 	return &Client{
-		BaseURL:  creds.Server,
-		Username: creds.UserID,
+		BaseURL:  server,
+		Username: userID,
 		r:        r,
 	}
 }

@@ -1,4 +1,4 @@
-package nextcloud
+package auth
 
 import (
 	"errors"
