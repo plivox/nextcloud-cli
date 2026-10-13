@@ -7,10 +7,10 @@ GOLANGCI_LINT := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v
 .PHONY: build run clean fmt lint vet tidy
 
 build:
-	go build -o $(BINARY) .
+	go build -o $(BINARY) ./cmd/nextcloud
 
 run:
-	go run . $(ARGS)
+	go run ./cmd/nextcloud $(ARGS)
 
 clean:
 	rm -f $(BINARY)

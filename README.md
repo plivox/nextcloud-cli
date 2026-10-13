@@ -5,7 +5,7 @@ A command-line client for Nextcloud. It currently supports [Deck](https://apps.n
 ## Installation
 
 ```sh
-go install github.com/plivox/nextcloud-cli@latest
+go install github.com/plivox/nextcloud-cli/cmd/nextcloud@latest
 ```
 
 Or from a clone:
