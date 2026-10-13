@@ -6,12 +6,13 @@ type Owner struct {
 }
 
 type Board struct {
-	ID       int     `json:"id"`
-	Title    string  `json:"title"`
-	Owner    Owner   `json:"owner"`
-	Color    string  `json:"color"`
-	Archived bool    `json:"archived"`
-	Labels   []Label `json:"labels,omitempty"`
+	ID        int     `json:"id"`
+	Title     string  `json:"title"`
+	Owner     Owner   `json:"owner"`
+	Color     string  `json:"color"`
+	Archived  bool    `json:"archived"`
+	Labels    []Label `json:"labels,omitempty"`
+	DeletedAt int64   `json:"deletedAt"`
 }
 
 func (c *Client) ListBoards() ([]Board, error) {
@@ -21,7 +22,14 @@ func (c *Client) ListBoards() ([]Board, error) {
 		return nil, err
 	}
 
-	return boards, nil
+	active := boards[:0]
+	for _, b := range boards {
+		if b.DeletedAt == 0 {
+			active = append(active, b)
+		}
+	}
+
+	return active, nil
 }
 
 func (c *Client) GetBoard(boardID int) (Board, error) {
