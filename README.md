@@ -19,9 +19,9 @@ make build   # produces ./nextcloud
 Set these variables in your environment, or in a `.env` file in the current directory (see `.env.example`):
 
 ```sh
-NEXTCLOUD_BASE_URL=https://cloud.example.com
-NEXTCLOUD_USERNAME=your_username
-NEXTCLOUD_PASSWORD=your_password
+NEXTCLOUD_CLI_BASE_URL=https://cloud.example.com
+NEXTCLOUD_CLI_USERNAME=your_username
+NEXTCLOUD_CLI_PASSWORD=your_password
 ```
 
 Using an [app password](https://docs.nextcloud.com/server/latest/user_manual/en/session_management.html#managing-devices) rather than your main password is recommended.

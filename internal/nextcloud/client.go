@@ -18,13 +18,13 @@ type Client struct {
 type PathParams map[string]int
 
 func NewClientFromEnv() (*Client, error) {
-	baseURL := os.Getenv("NEXTCLOUD_BASE_URL")
-	username := os.Getenv("NEXTCLOUD_USERNAME")
-	password := os.Getenv("NEXTCLOUD_PASSWORD")
+	baseURL := os.Getenv("NEXTCLOUD_CLI_BASE_URL")
+	username := os.Getenv("NEXTCLOUD_CLI_USERNAME")
+	password := os.Getenv("NEXTCLOUD_CLI_PASSWORD")
 
 	if baseURL == "" || username == "" || password == "" {
 		return nil, fmt.Errorf(
-			"NEXTCLOUD_BASE_URL, NEXTCLOUD_USERNAME and NEXTCLOUD_PASSWORD must be set (via .env or the environment)",
+			"NEXTCLOUD_CLI_BASE_URL, NEXTCLOUD_CLI_USERNAME and NEXTCLOUD_CLI_PASSWORD must be set (via .env or the environment)",
 		)
 	}
 
