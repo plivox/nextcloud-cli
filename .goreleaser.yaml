@@ -37,10 +37,10 @@ homebrew_casks:
     repository:
       owner: plivox
       name: homebrew-tap
-      token: '{{ envOrDefault "HOMEBREW_TAP_GITHUB_TOKEN" "" }}'
+      token: '{{ index .Env "HOMEBREW_TAP_GITHUB_TOKEN" }}'
     homepage: https://github.com/plivox/nextcloud-cli
     description: Command-line client and MCP server for Nextcloud Files and Deck
-    skip_upload: '{{ if envOrDefault "HOMEBREW_TAP_GITHUB_TOKEN" "" }}false{{ else }}true{{ end }}'
+    skip_upload: '{{ if index .Env "HOMEBREW_TAP_GITHUB_TOKEN" }}false{{ else }}true{{ end }}'
     hooks:
       post:
         # The binary isn't signed and notarized: remove the quarantine
