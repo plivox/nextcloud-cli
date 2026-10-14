@@ -44,41 +44,51 @@ NEXTCLOUD_CLI_PASSWORD=app-password
 
 ### Files
 
-| Command | |
-|---|---|
-| `files ls [path]` | List a folder |
-| `files get <remote> [local]` | Download a file |
-| `files put <local> [remote]` | Upload a file |
-| `files mkdir <path>` | Create a folder and its parents |
-| `files rm [-r] <path>` | Delete a file, or a folder with `-r` |
+| Command                      | Description                          |
+| ---------------------------- | ------------------------------------ |
+| `files ls [path]`            | List a folder                        |
+| `files get <remote> [local]` | Download a file                      |
+| `files put <local> [remote]` | Upload a file                        |
+| `files mkdir <path>`         | Create a folder and its parents      |
+| `files rm [-r] <path>`       | Delete a file, or a folder with `-r` |
 
 ### Deck
 
-| Command | |
-|---|---|
-| `deck board list` · `deck board <id>` | List boards, show one |
-| `deck board create\|update\|delete` | Manage boards |
-| `deck stack list --board <id>` | List stacks (columns) |
-| `deck stack create\|update\|delete --board <id>` | Manage stacks |
-| `deck card list --board <id>` | List cards, with filters and export (below) |
-| `deck card <id>` | Show a card |
-| `deck card create\|update\|move\|delete` | Manage cards |
-| `deck card assign\|unassign <id> <user>` | Assign users (`me` works) |
-| `deck card label\|unlabel <id> <label>` | Add or remove labels, by ID or title |
-| `deck card comment <id> <text>` · `deck card comments <id>` | Add or list comments |
-| `deck attachment list <card>` | List a card's attachments |
+| Command                                                     | Description                                 |
+| ----------------------------------------------------------- | ------------------------------------------- |
+| `deck board list` · `deck board <id>`                       | List boards, show one                       |
+| `deck board create\|update\|delete`                         | Manage boards                               |
+| `deck stack list --board <id>`                              | List stacks (columns)                       |
+| `deck stack create\|update\|delete --board <id>`            | Manage stacks                               |
+| `deck card list --board <id>`                               | List cards, with filters and export (below) |
+| `deck card <id>`                                            | Show a card                                 |
+| `deck card create\|update\|move\|delete`                    | Manage cards                                |
+| `deck card assign\|unassign <id> <user>`                    | Assign users (`me` works)                   |
+| `deck card label\|unlabel <id> <label>`                     | Add or remove labels, by ID or title        |
+| `deck card comment <id> <text>` · `deck card comments <id>` | Add or list comments                        |
+| `deck attachment list <card>`                               | List a card's attachments                   |
 
-Stacks and labels can be given by ID or title. Examples:
+Stacks and labels can be given by ID or title.
+
+**Filter cards and pick the columns** (comma-separated values are OR'ed):
 
 ```sh
-# Filter (comma-separated values are OR'ed) and pick columns
-nextcloud deck card list --board 40 --status in-progress,overdue --stack "In progress" \
-  --assignee me --column id,title,assignees
+nextcloud deck card list --board 40 \
+  --status in-progress,overdue \
+  --stack "In progress" \
+  --assignee me \
+  --column id,title,assignees
+```
 
-# Export the board as JSON and download every attachment
+**Export a board** as JSON, with every attachment:
+
+```sh
 nextcloud deck card list --board 40 --json --download ./backup
+```
 
-# Create a card, then move it and mark it as done
+**Create a card**, then move it and mark it as done:
+
+```sh
 nextcloud deck card create --board 40 --stack "To do" "Write docs" --due 2026-11-01
 nextcloud deck card move 123 --stack "Done"
 nextcloud deck card update 123 --done
@@ -95,9 +105,9 @@ claude mcp add nextcloud -- nextcloud mcp                # read-only
 claude mcp add nextcloud -- nextcloud mcp --allow-write  # also create, change and delete
 ```
 
-| Mode | Tools |
-|---|---|
-| Always | `deck_list_boards`, `deck_get_board`, `deck_list_cards`, `deck_get_card`, `files_list`, `files_read` |
+| Mode            | Tools                                                                                                 |
+| --------------- | ----------------------------------------------------------------------------------------------------- |
+| Always          | `deck_list_boards`, `deck_get_board`, `deck_list_cards`, `deck_get_card`, `files_list`, `files_read`  |
 | `--allow-write` | Create, update and delete boards, stacks, cards and files; move cards; assign users; labels; comments |
 
 ## Development
