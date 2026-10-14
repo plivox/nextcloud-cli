@@ -6,7 +6,13 @@ A command-line client for Nextcloud **Files** and **[Deck](https://apps.nextclou
 
 ## Installation
 
-**macOS and Linux**, latest release (see [`install.sh`](install.sh)):
+**Homebrew** (macOS and Linux):
+
+```sh
+brew install plivox/tap/nextcloud-cli
+```
+
+**Install script** (macOS and Linux, see [`install.sh`](install.sh)):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/plivox/nextcloud-cli/main/install.sh | sh
