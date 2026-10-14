@@ -112,8 +112,40 @@ claude mcp add nextcloud -- nextcloud mcp --allow-write  # also create, change a
 
 ## Development
 
+Requires Go 1.27+.
+
 ```sh
-make build   # ./nextcloud
-make fmt     # wsl + golines (80 columns)
-make lint    # golangci-lint
+git clone https://github.com/plivox/nextcloud-cli && cd nextcloud-cli
+make run ARGS="deck board list"   # run from source
 ```
+
+| Command      | Description                                          |
+| ------------ | ---------------------------------------------------- |
+| `make build` | Build `./nextcloud`                                  |
+| `make test`  | Run the tests                                        |
+| `make lint`  | Run golangci-lint (with wsl)                         |
+| `make fmt`   | Fix blank lines (wsl) and wrap lines at 80 (golines) |
+| `make vet`   | Run `go vet`                                         |
+
+CI runs lint, tests and builds for Linux, macOS and Windows on every push and pull request.
+
+Code layout: `cmd/nextcloud` (entry point), `internal/cli` (commands), `internal/mcp` (MCP server), `internal/api` (HTTP client, with `deck` and `files`), `internal/auth` (credentials and login).
+
+### Releasing
+
+1. Make sure `main` is green in [CI](https://github.com/plivox/nextcloud-cli/actions/workflows/ci.yml).
+2. Tag the version ([semver](https://semver.org)) and push the tag:
+
+   ```sh
+   git tag -a v0.2.0 -m "v0.2.0"
+   git push origin v0.2.0
+   ```
+
+3. The [Release workflow](https://github.com/plivox/nextcloud-cli/actions/workflows/release.yml) runs [GoReleaser](https://goreleaser.com), which:
+   - builds the binaries for Linux, macOS and Windows (amd64, arm64);
+   - publishes the GitHub release with archives, checksums and a changelog from the commits;
+   - updates the `nextcloud-cli` cask in [plivox/homebrew-tap](https://github.com/plivox/homebrew-tap).
+
+To try the release locally without publishing: `go run github.com/goreleaser/goreleaser/v2@latest release --snapshot --clean` (output in `dist/`).
+
+The cask is pushed with the `HOMEBREW_TAP_GITHUB_TOKEN` secret, a fine-grained token with *Contents: read and write* on `plivox/homebrew-tap`. Renew it before it expires, or the release fails at the Homebrew step.
