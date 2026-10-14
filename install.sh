@@ -1,11 +1,4 @@
 #!/bin/sh
-# Install the latest nextcloud-cli release (macOS and Linux).
-#
-#   curl -fsSL https://raw.githubusercontent.com/plivox/nextcloud-cli/main/install.sh | sh
-#
-# Environment variables:
-#   VERSION      release tag to install, e.g. v0.1.0 (default: latest)
-#   INSTALL_DIR  where to put the binary (default: /usr/local/bin)
 
 set -eu
 

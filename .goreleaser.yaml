@@ -42,8 +42,6 @@ homebrew_casks:
     description: Command-line client and MCP server for Nextcloud Files and Deck
     hooks:
       post:
-        # The binary isn't signed and notarized: remove the quarantine
-        # attribute so that Gatekeeper doesn't block it.
         install: |
           if OS.mac?
             system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/nextcloud"]
