@@ -12,6 +12,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:           "nextcloud",
+	Version:       version(),
 	Short:         "Command-line client for Nextcloud",
 	SilenceErrors: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {

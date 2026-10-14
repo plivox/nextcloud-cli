@@ -1,3 +1,4 @@
 .env
 /nextcloud
 .DS_Store
+/dist/
