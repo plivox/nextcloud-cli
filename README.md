@@ -105,10 +105,10 @@ claude mcp add nextcloud -- nextcloud mcp                # read-only
 claude mcp add nextcloud -- nextcloud mcp --allow-write  # also create, change and delete
 ```
 
-| Mode            | Tools                                                                                                 |
-| --------------- | ----------------------------------------------------------------------------------------------------- |
-| Always          | `deck_list_boards`, `deck_get_board`, `deck_list_cards`, `deck_get_card`, `files_list`, `files_read`  |
-| `--allow-write` | Create, update and delete boards, stacks, cards and files; move cards; assign users; labels; comments |
+|       | Default (read-only)         | With `--allow-write`                                 |
+| ----- | --------------------------- | ---------------------------------------------------- |
+| Deck  | `deck_list_*`, `deck_get_*` | Create, update, delete, move, assign, label, comment |
+| Files | `files_list`, `files_read`  | `files_write`, `files_mkdir`, `files_delete`         |
 
 ## Development
 
