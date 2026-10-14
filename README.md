@@ -5,10 +5,30 @@
 A command-line client for Nextcloud **Files** and **[Deck](https://apps.nextcloud.com/apps/deck)**, which also runs as an **[MCP](https://modelcontextprotocol.io) server** for AI assistants.
 
 ```sh
-go install github.com/plivox/nextcloud-cli/cmd/nextcloud@latest
 nextcloud login cloud.example.com
 nextcloud deck card list --board 40 --assignee me --status overdue
 ```
+
+## Installation
+
+**macOS and Linux**, latest release:
+
+```sh
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m | sed 's/x86_64/amd64/; s/aarch64/arm64/')
+curl -sL "https://github.com/plivox/nextcloud-cli/releases/latest/download/nextcloud-cli_${OS}_${ARCH}.tar.gz" | tar -xz nextcloud
+sudo mv nextcloud /usr/local/bin/
+```
+
+**Windows**: download `nextcloud-cli_windows_amd64.zip` from the [releases](https://github.com/plivox/nextcloud-cli/releases/latest) and put `nextcloud.exe` in your `PATH`.
+
+**With Go** (1.27+):
+
+```sh
+go install github.com/plivox/nextcloud-cli/cmd/nextcloud@latest
+```
+
+> On macOS, a binary downloaded with a browser is blocked by Gatekeeper because it isn't signed. Run `xattr -d com.apple.quarantine nextcloud` once, or use the `curl` command above.
 
 ## Authentication
 
